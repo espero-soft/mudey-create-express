@@ -1,6 +1,6 @@
 {
   "name": "mudey-create-express",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Create Express Js project with typescript",
   "main": "bin/mudey-create-express",
   "scripts": {

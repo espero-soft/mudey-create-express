@@ -1,0 +1,129 @@
+#!/usr/bin/env node
+const { exec } = require('child_process');
+const readline = require('readline');
+const fs = require('fs');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+let projectName = process.argv[2];
+
+if (!projectName || (projectName === '--h') || projectName === '-help') {
+    console.error('Usage: mudey-create-express <project-name>');
+    process.exit(1);
+}
+
+function runCommand(command) {
+    return new Promise((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Erreur lors de l'exécution de la commande : ${error}`);
+                reject(error);
+            } else {
+                console.log(stdout);
+                resolve();
+            }
+        });
+    });
+}
+
+async function createExpressProject() {
+    console.log('Creating Express.js project with TypeScript:');
+
+   
+    // Demandez le nom du projet à l'utilisateur
+
+    console.log(`Creating the project directory ${projectName}...`);
+
+    // Créez le répertoire du projet
+    fs.mkdirSync(`${projectName}`);
+
+    // Accédez au répertoire du projet
+    process.chdir(projectName);
+
+    // Initialisez un projet Node.js
+    await runCommand('npm init -y');
+
+    // Installez les dépendances nécessaires (Express, TypeScript, etc.)
+    await runCommand('npm install express typescript @types/node @types/express ts-node dotenv twig');
+
+    // Initialisez un projet TypeScript
+    // Créez un fichier tsconfig.json pour configurer TypeScript
+    fs.writeFileSync('tsconfig.json', `
+        {
+        "compilerOptions": {
+            "target": "ES6",
+            "module": "commonjs",
+            "outDir": "./dist",
+            "rootDir": "./src",
+            "strict": true,
+            "esModuleInterop": true,
+            "skipLibCheck": true
+        },
+        "include": ["src/**/*.ts"],
+        "exclude": ["node_modules"]
+        }
+        `);
+
+    // Créez un répertoire "src" et un fichier "app.ts"
+    fs.mkdirSync('config');
+    fs.mkdirSync('public');
+    fs.mkdirSync('public/assets');
+    fs.mkdirSync('public/assets/css');
+    fs.mkdirSync('public/assets/js');
+    fs.mkdirSync('public/assets/images');
+    fs.mkdirSync('src');
+    fs.mkdirSync('src/views');
+    fs.mkdirSync('src/views');
+    fs.mkdirSync('src/controllers');
+    fs.mkdirSync('src/models');
+    fs.mkdirSync('src/routes');
+    fs.mkdirSync('src/storage');
+
+
+
+    // Ajoutez un exemple de code Express.js à "app.ts"
+    const appCode = `
+        import express, {Express} from 'express'
+        import dotenv from 'dotenv'
+        import path from 'path'
+        
+        import indexRouter from "./src/routes/index.route"
+        
+        dotenv.config()
+        
+        const app: Express = express();
+        
+        const port = process.env.PORT || 3000
+        
+        app.set("views", path.join(process.cwd(), "views"))
+        app.set("views engine", "twig")
+        
+        app.use("/", indexRouter)
+        
+        app.listen(port, ()=>{
+            console.log(\`⚡️[server]: Server is running at http://localhost:\${port}\`);
+        })
+        `;
+
+    require('fs').writeFileSync('src/app.ts', appCode);
+
+    // Ajoutez un script de démarrage à package.json
+    const packageJson = JSON.parse(fs.readFileSync("package.json"))
+    
+    packageJson.scripts.start = 'ts-node src/app.ts';
+    fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
+
+    console.log(`Project '${projectName}' has been created.`);
+    console.log('To start the project, run:');
+    console.log(`cd ${projectName}`);
+    console.log('npm start');
+
+
+    rl.close();
+
+}
+
+createExpressProject();

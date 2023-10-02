@@ -1,0 +1,21 @@
+{
+  "name": "mudey-create-express",
+  "version": "1.0.0",
+  "description": "Create Express Js project with typescript",
+  "main": "bin/mudey-create-express",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin":{
+    "mudey-create-express": "bin/mudey-create-express"
+  },
+  "keywords": [
+    "mudey",
+    "espero-soft",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "Mudey Formation",
+  "license": "MIT"
+}
